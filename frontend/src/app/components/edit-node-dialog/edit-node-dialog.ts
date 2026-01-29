@@ -1,6 +1,7 @@
 import {Component, inject} from '@angular/core';
-import {MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TreeNodeDto} from '@ptc-api-models/treeNodeDto';
 
 @Component({
   selector: 'app-edit-node-dialog',
@@ -12,27 +13,32 @@ import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 })
 export class EditNodeDialog {
 
-  // data = inject<Observable<DocumentDto[]>>(MAT_DIALOG_DATA);
+  data = inject<TreeNodeDto>(MAT_DIALOG_DATA);
   dialogRef = inject(MatDialogRef<EditNodeDialog>);
 
   fb = inject(FormBuilder);
-
-  // templates: DocumentDto[];
 
   form = this.fb.group({
     name: ['', Validators.required],
     content: ['', Validators.required]
   });
 
+  treeNode: TreeNodeDto | undefined;
+
   constructor() {
-    // this.data.subscribe(templates => {
-    //   this.templates = templates;
-    //   this.form.patchValue(templates[0])
-    // });
+    this.treeNode = this.data;
+    if (this.treeNode) {
+      this.form.patchValue({name: this.treeNode.name, content: this.treeNode.content});
+    }
   }
 
   submit() {
-    this.dialogRef.close(this.form.value);
+    this.treeNode = {
+      ...this.treeNode,
+      name: this.form.value.name!,
+      content: this.form.value.content!
+    }
+    this.dialogRef.close(this.treeNode);
   }
 
   close() {

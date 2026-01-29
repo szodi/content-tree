@@ -27,6 +27,11 @@ export const TreeNodeStore = signalStore(
       addNode(rootNode!, treeNode, parentId);
       console.log('after', rootNode)
       patchState(store, { rootNode: { ...rootNode} })
+    },
+    updateNode(treeNode: TreeNodeDto) {
+      const rootNode = store.rootNode()!;
+      updateNode(rootNode!, treeNode);
+      patchState(store, { rootNode: { ...rootNode} })
     }
   }))
 );
@@ -37,4 +42,12 @@ function addNode(rootNode: TreeNodeDto, treeNode: TreeNodeDto, parentId: number)
     return;
   }
   rootNode.children?.forEach(child => addNode(child, treeNode, parentId));
+}
+
+function updateNode(rootNode: TreeNodeDto, treeNode: TreeNodeDto) {
+  if (rootNode.id === treeNode.id) {
+    rootNode = {...treeNode};
+    return;
+  }
+  rootNode.children?.forEach(child => updateNode(child, treeNode));
 }

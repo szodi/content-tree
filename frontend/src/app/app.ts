@@ -36,12 +36,25 @@ export class App implements OnInit {
       width: '832px'
     }).afterClosed().pipe(
       filter(node => !!node),
-      switchMap(node => this.treeNodeService.create(node))
+      switchMap(node => this.treeNodeService.create({
+        ...node,
+        parentId: this.selectedNode()!.id!
+      }))
     ).subscribe(node => this.treeNodeStore.addNode(node, this.selectedNode()!.id!));
+  }
+
+  editTreeNode() {
+    this.dialog.open(EditNodeDialog, {
+      width: '832px',
+      data: this.selectedNode()
+    }).afterClosed().pipe(
+      filter(node => !!node),
+      switchMap(node => this.treeNodeService.create(node))
+    ).subscribe(node => this.treeNodeStore.updateNode(node));
   }
 
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
-    // this.treeNodeService.deleteTreeNode(this.selectedNode()!.id!).subscribe();
+    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe();
   }
 }

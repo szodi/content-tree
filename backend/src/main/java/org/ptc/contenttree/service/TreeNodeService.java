@@ -48,13 +48,6 @@ public class TreeNodeService {
                 .orElse(null);
     }
 
-    public TreeNode getRootNode() {
-        return storage.findAll().stream()
-                .filter(n -> n.getParentId() == null)
-                .findFirst()
-                .orElse(null);
-    }
-
     public TreeNodeDto move(Long nodeId, Long newParentId) throws IOException {
         TreeNode node = storage.findById(nodeId);
         TreeNode newParent = storage.findById(newParentId);

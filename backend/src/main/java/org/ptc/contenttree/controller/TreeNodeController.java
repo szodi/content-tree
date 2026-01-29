@@ -18,28 +18,23 @@ public class TreeNodeController {
     private final TreeNodeService service;
 
     @PostMapping("/node")
-    public TreeNode create(@RequestBody Map<String,Object> body) throws IOException {
+    public TreeNode create(@RequestBody TreeNodeDto treeNodeDto) throws IOException {
         return service.createOrUpdate(
-                (String) body.get("name"),
-                (String) body.get("content"),
-                body.get("parentId") == null ? null : Long.valueOf(body.get("parentId").toString()),
-                body.get("id") == null ? null : Long.valueOf(body.get("id").toString())
+                treeNodeDto.getName(),
+                treeNodeDto.getContent(),
+                treeNodeDto.getParentId(),
+                treeNodeDto.getId()
         );
     }
 
     @DeleteMapping("/node/{id}")
-    public void delete(@PathVariable Long id) throws IOException {
+    public void deleteNode(@PathVariable Long id) throws IOException {
         service.delete(id);
     }
 
     @GetMapping("/node/list")
     public TreeNodeDto listTree() {
         return service.listTree();
-    }
-
-    @GetMapping
-    public TreeNode getRootNode() {
-        return service.getRootNode();
     }
 
     @PutMapping("/move/{nodeId}/{newParentNodeId}")
