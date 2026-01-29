@@ -1,0 +1,9 @@
+@if (nodes()?.length) {
+  @for (node of nodes(); track $index) {
+    <app-my-node #treeNodeRef
+                 [treeNode]="node"
+                 [isSelected]="node === selectedNode()"
+                 (mousedown)="startDrag($event, node)">
+    </app-my-node>
+  }
+}

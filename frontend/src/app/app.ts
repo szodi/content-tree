@@ -7,6 +7,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {EditNodeDialog} from './components/edit-node-dialog/edit-node-dialog';
 import {Confirm} from './decorators/confirm-dialog.decorator';
 import {ReactiveFormsModule} from '@angular/forms';
+import {TreeStore} from './tree.store';
 
 @Component({
   selector: 'app-root',
@@ -16,19 +17,17 @@ import {ReactiveFormsModule} from '@angular/forms';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  treeNodeStore = inject(TreeNodeStore);
+  treeStore = inject(TreeStore);
   treeNodeService = inject(TreeNodeControllerService);
 
   dialog = inject(MatDialog);
 
-  rootNode = this.treeNodeStore.rootNode;
-  selectedNode = this.treeNodeStore.selectedNode;
+  selectedNode = this.treeStore.selectedNode;
 
 
   ngOnInit() {
-    this.treeNodeService.listTree().subscribe(rootNode => {
-      this.treeNodeStore.setTreeNode(rootNode);
-      this.treeNodeStore.setSelectedNode(rootNode);
+    this.treeNodeService.getAllNodes().subscribe(nodes => {
+      this.treeStore.setNodes(nodes);
     });
   }
 
@@ -41,7 +40,7 @@ export class App implements OnInit {
         ...node,
         parentId: this.selectedNode()!.id!
       }))
-    ).subscribe(node => this.treeNodeStore.addNode(node, this.selectedNode()!.id!));
+    ).subscribe(node => this.treeStore.addNode(node));
   }
 
   editTreeNode() {
@@ -51,12 +50,12 @@ export class App implements OnInit {
     }).afterClosed().pipe(
       filter(node => !!node),
       switchMap(node => this.treeNodeService.create(node))
-    ).subscribe(node => this.treeNodeStore.updateNode(node));
+    ).subscribe(node => this.treeStore.updateNode(node));
   }
 
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
-    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe();
+    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe(() => this.treeStore.deleteNode(this.selectedNode()!));
   }
 
   search(query: string) {

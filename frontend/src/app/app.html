@@ -1,6 +1,8 @@
 <div class="main-container">
   <div class="tree-container no-select">
-    <app-my-node-tree></app-my-node-tree>
+    @if (treeStore.nodes()?.length) {
+      <app-my-node-tree></app-my-node-tree>
+    }
   </div>
   <div class="content-container">
     {{ selectedNode()?.content ?? 'Select a node to see its content' }}

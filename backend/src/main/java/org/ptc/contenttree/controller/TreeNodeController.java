@@ -7,6 +7,7 @@ import org.ptc.contenttree.service.TreeNodeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,11 @@ public class TreeNodeController {
     @DeleteMapping("/node/{id}")
     public void deleteNode(@PathVariable Long id) throws IOException {
         service.delete(id);
+    }
+
+    @GetMapping("/node/all")
+    public Collection<TreeNode> getAllNodes() {
+        return service.getAllNodes();
     }
 
     @GetMapping("/node/list")

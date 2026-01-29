@@ -7,6 +7,7 @@ import org.ptc.contenttree.model.TreeNode;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -38,6 +39,10 @@ public class TreeNodeService {
     public void delete(Long id) throws IOException {
         storage.delete(id);
         storage.save();
+    }
+
+    public Collection<TreeNode> getAllNodes() {
+        return storage.findAll();
     }
 
     public TreeNodeDto listTree() {

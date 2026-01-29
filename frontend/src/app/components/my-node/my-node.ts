@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {TreeNodeDto} from '@ptc-api-models/treeNodeDto';
 import {NgClass} from '@angular/common';
+import {TreeNode} from '@ptc-api-models/treeNode';
 
 @Component({
   selector: 'app-my-node',
@@ -14,7 +14,7 @@ export class MyNode {
   @Input() isSelected= false;
   @Input() isOverlapped= false;
   @Input() dragging= false;
-  @Input() treeNode: TreeNodeDto | undefined;
+  @Input() treeNode: TreeNode | undefined;
 
   @Output() clicked = new EventEmitter<MouseEvent>();
 
