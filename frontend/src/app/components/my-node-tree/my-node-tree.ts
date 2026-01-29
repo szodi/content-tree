@@ -73,7 +73,7 @@ export class MyNodeTree {
     if (box.instance.treeNode === this.rootNode()) return;
     this.draggingBox.set(box);
     this.draggingBox()!.location.nativeElement.style.zIndex = '1000';
-    this.draggingBox()!.location.nativeElement.classList.add('no-select');
+    this.draggingBox()!.location.nativeElement.style.transition = 'none';
     const draggingBoxBounds = this.draggingBox()?.location.nativeElement.getBoundingClientRect();
     this.draggingBoxOffset.set({
       x: event.clientX - draggingBoxBounds.x,
@@ -82,6 +82,7 @@ export class MyNodeTree {
     this.offsets = [];
     this.subtree().forEach(node => {
       node.location.nativeElement.style.zIndex = '1000';
+      node.location.nativeElement.style.transition = 'none';
       const nodeBounds = node.location.nativeElement.getBoundingClientRect();
       this.offsets.push({
         x: event.clientX - nodeBounds.x,
@@ -111,8 +112,11 @@ export class MyNodeTree {
   onMouseUp() {
     if (this.draggingBox()) {
       this.draggingBox()!.location.nativeElement.style.zIndex = '1';
-      this.draggingBox()!.location.nativeElement.classList.remove('no-select');
-      this.subtree().forEach(node => node.location.nativeElement.style.zIndex = '1');
+      this.draggingBox()!.location.nativeElement.style.transition = 'top 0.2s ease-out, left 0.2s ease-out';
+      this.subtree().forEach(node => {
+        node.location.nativeElement.style.zIndex = '1';
+        node.location.nativeElement.style.transition = 'top 0.2s ease-out, left 0.2s ease-out';
+      });
     }
     const targetNode = this.nodeComponents().find(compRef => compRef.instance.isOverlapped)?.instance;
     this.nodeComponents().forEach(b => b.instance.isOverlapped = false);

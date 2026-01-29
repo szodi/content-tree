@@ -19,4 +19,10 @@ body {
   line-height: 1.8;
   width: 100%;
 }
-/* You can add global styles to this file, and also import other style files */
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* old Edge/IE */
+}
+
