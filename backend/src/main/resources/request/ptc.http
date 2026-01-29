@@ -1,0 +1,38 @@
+### getRootTreeNode
+GET http://localhost:8080/nodes/
+Content-Type: application/json
+
+### getTreeNodeList
+GET http://localhost:8080/nodes/1
+Content-Type: application/json
+
+### createTreeNode
+POST http://localhost:8080/nodes/
+Content-Type: application/json
+
+{
+  "name": "my-tree-node-name",
+  "content": "my-tree-node-content"
+}
+
+### updateTreeNode
+PUT http://localhost:8080/nodes/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "updated-node-name",
+  "content": "updated-node-content"
+}
+
+### getTreeNode
+GET http://localhost:8080/nodes/1
+Content-Type: application/json
+
+### relocateTreeNode
+PUT http://localhost:8080/nodes/2/1
+Content-Type: application/json
+
+### deleteTreeNode
+DELETE http://localhost:8080/nodes/5
+Content-Type: application/json

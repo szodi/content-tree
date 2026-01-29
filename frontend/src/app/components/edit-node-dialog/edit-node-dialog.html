@@ -1,0 +1,26 @@
+<form [formGroup]="form" class="dialog-form">
+  <h2 class="dialog-title">Select certificate template</h2>
+
+<!--    <p class="label">Template:</p>-->
+<!--    <select class="j-common-input" formControlName="id">-->
+<!--      @for (template of templates; track $index) {-->
+<!--        <option [value]="template.id">{{ template.title }}</option>-->
+<!--      }-->
+<!--    </select>-->
+
+  <p class="label required">Name</p>
+  <input class="j-common-input" formControlName="name" placeholder="Node name" />
+
+  <p class="label required">Content</p>
+  <input class="j-common-input" formControlName="content" placeholder="Node content" />
+
+
+  <div class="button-row-container">
+    <button class="j-common-button" (click)="submit()" [disabled]="form.invalid" data-cy="manage-document-save">
+      <span>Generate</span>
+    </button>
+    <button class="j-common-button border-only cancel-button" (click)="close()" data-cy="manage-document-cancel">
+      <span>Cancel</span>
+    </button>
+  </div>
+</form>

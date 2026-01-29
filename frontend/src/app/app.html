@@ -1,0 +1,12 @@
+<!--<header>-->
+<!--  <button (click)="addTreeNode()">Add</button>-->
+<!--  <button (click)="deleteTreeNode()">Delete</button>-->
+<!--</header>-->
+<div class="main-container">
+  <div class="tree-container">
+    <app-my-node-tree class="no-select"></app-my-node-tree>
+  </div>
+  <div class="content-container">
+    {{ selectedNode()?.content ?? 'Select a node to see its content' }}
+  </div>
+</div>

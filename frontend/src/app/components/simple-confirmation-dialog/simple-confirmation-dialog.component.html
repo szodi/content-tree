@@ -1,0 +1,11 @@
+<div class="result-dialog-container" data-cy="result-dialog">
+  <div class="info-text" [innerHTML]="data.question"></div>
+  <div class="button-row-container">
+    <button class="j-common-button" data-cy="yes-button" (click)="close(true)">
+      <span>Yes</span>
+    </button>
+    <button class="j-common-button border-only" data-cy="no-button" (click)="close(false)">
+      <span class="button-label">No</span>
+    </button>
+  </div>
+</div>
