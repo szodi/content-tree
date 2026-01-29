@@ -25,10 +25,6 @@ Content-Type: application/json
 GET http://localhost:8080/api/tree/node/all
 Content-Type: application/json
 
-### listTree
-GET http://localhost:8080/api/tree/node/list
-Content-Type: application/json
-
 ### move
 PUT http://localhost:8080/api/tree/move/3/2
 Content-Type: application/json

@@ -1,8 +1,6 @@
 package org.ptc.contenttree.service;
 
 import lombok.RequiredArgsConstructor;
-import org.ptc.contenttree.dto.TreeNodeDto;
-import org.ptc.contenttree.mapper.TreeNodeMapper;
 import org.ptc.contenttree.model.TreeNode;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +13,6 @@ import java.util.List;
 public class TreeNodeService {
 
     private final JsonTreeStorage storage;
-    private final TreeNodeMapper treeNodeMapper;
 
     public TreeNode createOrUpdate(String name, String content, Long parentId, Long id) throws IOException {
         TreeNode node = (id != null) ? storage.findById(id) : new TreeNode();
@@ -45,15 +42,7 @@ public class TreeNodeService {
         return storage.findAll();
     }
 
-    public TreeNodeDto listTree() {
-        return storage.findAll().stream()
-                .filter(n -> n.getParentId() == null)
-                .map(treeNodeMapper::convert)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public TreeNodeDto move(Long nodeId, Long newParentId) throws IOException {
+    public Collection<TreeNode> move(Long nodeId, Long newParentId) throws IOException {
         TreeNode node = storage.findById(nodeId);
         TreeNode newParent = storage.findById(newParentId);
 
@@ -69,7 +58,7 @@ public class TreeNodeService {
         storage.createOrUpdate(newParent);
         storage.createOrUpdate(node);
 
-        return listTree();
+        return getAllNodes();
     }
 
     public String loadContent(Long id) {

@@ -1,7 +1,6 @@
 package org.ptc.contenttree.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.ptc.contenttree.dto.TreeNodeDto;
 import org.ptc.contenttree.model.TreeNode;
 import org.ptc.contenttree.service.TreeNodeService;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +18,12 @@ public class TreeNodeController {
     private final TreeNodeService service;
 
     @PostMapping("/node")
-    public TreeNode create(@RequestBody TreeNodeDto treeNodeDto) throws IOException {
+    public TreeNode create(@RequestBody Map<String,Object> body) throws IOException {
         return service.createOrUpdate(
-                treeNodeDto.getName(),
-                treeNodeDto.getContent(),
-                treeNodeDto.getParentId(),
-                treeNodeDto.getId()
+                (String) body.get("name"),
+                (String) body.get("content"),
+                body.get("parentId") == null ? null : Long.valueOf(body.get("parentId").toString()),
+                body.get("id") == null ? null : Long.valueOf(body.get("id").toString())
         );
     }
 
@@ -38,13 +37,8 @@ public class TreeNodeController {
         return service.getAllNodes();
     }
 
-    @GetMapping("/node/list")
-    public TreeNodeDto listTree() {
-        return service.listTree();
-    }
-
     @PutMapping("/move/{nodeId}/{newParentNodeId}")
-    public TreeNodeDto move(@PathVariable Long nodeId, @PathVariable Long newParentNodeId) throws IOException {
+    public Collection<TreeNode> move(@PathVariable Long nodeId, @PathVariable Long newParentNodeId) throws IOException {
         return service.move(nodeId, newParentNodeId);
     }
 

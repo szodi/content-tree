@@ -24,127 +24,6 @@ interface TreeNodeBlock {
 })
 export class MyNodeTree {
 
-  // treeNodeStore = inject(TreeNodeStore);
-  // treeNodeService = inject(TreeNodeControllerService);
-  //
-  // rootNode = this.treeNodeStore.rootNode;
-  // selectedNode = this.treeNodeStore.selectedNode;
-  //
-  //
-  // nodeComponents = signal<ComponentRef<MyNode>[]>([]);
-  //
-  //
-  // viewContainer = inject(ViewContainerRef);
-  // offsets: Point[] = [];
-
-  constructor() {
-    effect(() => {
-      if (this.nodes()?.length && this.blocks()?.length) {
-        this.relocateComponents();
-      }
-    });
-    // effect(() => {
-    //   if (this.rootNode() && !this.nodeComponents().length) {
-    //     // this.initComponents();
-    //   }
-    // });
-    // effect(() => {
-    //   if (this.selectedNode() && this.nodeComponents().length) {
-    //     this.nodeComponents().forEach(compRef => compRef.instance.isSelected = compRef.instance.treeNode?.id === this.selectedNode()!.id);
-    //   }
-    // });
-  }
-
-  // private initComponents() {
-  //   let comps: ComponentRef<MyNode>[] = [];
-  //   this.createComponentRefList(this.rootNode() ?? {}, comps);
-  //   this.nodeComponents.set(comps);
-  //   this.setPositions(this.rootNode()!, [], 0);
-  // }
-  //
-  //
-  // startDrag(event: MouseEvent, box: ComponentRef<MyNode>) {
-  //   this.selectNode(box.instance.treeNode!);
-  //   if (box.instance.treeNode === this.rootNode()) return;
-  //   box.instance.dragging = true;
-  //   this.draggingBox.set(box);
-  //   this.draggingBox()!.location.nativeElement.style.zIndex = '1000';
-  //   this.draggingBox()!.location.nativeElement.style.transition = 'none';
-  //   const draggingBoxBounds = this.draggingBox()?.location.nativeElement.getBoundingClientRect();
-  //   this.draggingBoxOffset.set({
-  //     x: event.clientX - draggingBoxBounds.x,
-  //     y: event.clientY - draggingBoxBounds.y
-  //   });
-  //   this.offsets = [];
-  //   this.subtree().forEach(node => {
-  //     node.instance.dragging = true;
-  //     node.location.nativeElement.style.zIndex = '1000';
-  //     node.location.nativeElement.style.transition = 'none';
-  //     const nodeBounds = node.location.nativeElement.getBoundingClientRect();
-  //     this.offsets.push({
-  //       x: event.clientX - nodeBounds.x,
-  //       y: event.clientY - nodeBounds.y
-  //     })
-  //   });
-  // }
-  //
-  //
-  //
-  // private detectOverlaps() {
-  //   if (!this.draggingBox()) return;
-  //
-  //   const draggingBoxBounds = this.draggingBox()?.location.nativeElement.getBoundingClientRect();
-  //
-  //   this.nodeComponents().forEach(compRef => {
-  //     const b = compRef.instance;
-  //     if (b === this.draggingBox()!.instance) {
-  //       b.isOverlapped = false;
-  //       return;
-  //     }
-  //
-  //     const componentBounds = compRef.location.nativeElement.getBoundingClientRect();
-  //
-  //     b.isOverlapped = !(
-  //       draggingBoxBounds.x + draggingBoxBounds.width < componentBounds.x ||
-  //       draggingBoxBounds.x > componentBounds.x + componentBounds.width ||
-  //       draggingBoxBounds.y + draggingBoxBounds.height < componentBounds.y ||
-  //       draggingBoxBounds.y > componentBounds.y + componentBounds.height
-  //     );
-  //   });
-  // }
-  //
-  // private setPositions(node: TreeNodeDto, relocated: number[], level: number) {
-  //   const compRef = this.findComponentRef(node)!;
-  //   this.setComponentPosition(compRef, {
-  //     x: level * this.horizontalGap,
-  //     y: relocated.length * this.verticalGap
-  //   });
-  //   relocated.push(0);
-  //   node.children?.forEach(child => this.setPositions(child, relocated, level + 1));
-  // }
-  //
-  // private createComponentRefList(node: TreeNodeDto, comps: ComponentRef<MyNode>[]) {
-  //   // const comp = this.viewContainer.createComponent(MyNode);
-  //   // comp.instance.isOverlapped = false;
-  //   // comp.instance.dragging = false;
-  //   // comp.instance.treeNode = node;
-  //   // comp.instance.clicked.subscribe(e => this.startDrag(e, comp));
-  //   // comps.push(comp);
-  //   // node.children?.forEach(child => this.createComponentRefList(child, comps));
-  // }
-  //
-  //
-  //
-  // private findComponentRef(node: TreeNodeDto): ComponentRef<MyNode> | undefined {
-  //   return this.nodeComponents().find(compRef => compRef.instance.treeNode === node);
-  // }
-  //
-  //
-
-
-
-
-
   private verticalGap = 50;
   private horizontalGap = 50;
 
@@ -183,6 +62,14 @@ export class MyNodeTree {
   })
 
   offsets: Point[] = [];
+
+  constructor() {
+    effect(() => {
+      if (this.nodes()?.length && this.blocks()?.length) {
+        this.relocateComponents();
+      }
+    });
+  }
 
   selectNode(node: TreeNode) {
     this.treeStore.setSelectedNode(node);
@@ -298,7 +185,7 @@ export class MyNodeTree {
   }
 
   relocateComponents() {
-    // console.log('relocateComponents called!', this.nodes(), this.blocks())
+    this.blocks().forEach(block => block.position = {x: 0, y: 0});
     const rootBlock = this.blocks().find(block => block.treeNode.id === this.rootNode()!.id)!;
     const relocatedBlocks: TreeNodeBlock[] = [];
     this.relocate(rootBlock.treeNode, {x: 0, y: 0}, relocatedBlocks);

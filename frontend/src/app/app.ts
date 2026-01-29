@@ -1,5 +1,4 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {TreeNodeStore} from './app.store';
 import {MyNodeTree} from './components/my-node-tree/my-node-tree';
 import {TreeNodeControllerService} from '@ptc-api-services/treeNodeController.service';
 import {filter, switchMap} from 'rxjs';
@@ -13,7 +12,6 @@ import {TreeStore} from './tree.store';
   selector: 'app-root',
   templateUrl: './app.html',
   imports: [MyNodeTree, ReactiveFormsModule],
-  providers: [TreeNodeStore],
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
