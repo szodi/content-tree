@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tree")
@@ -44,7 +45,7 @@ public class TreeNodeController {
 
     @GetMapping("/content/{id}")
     public Map<String,String> load(@PathVariable Long id) {
-        return Map.of("content", service.loadContent(id));
+        return Map.of("content", Optional.ofNullable(service.loadContent(id)).orElse(""));
     }
 
     @GetMapping("/search")
