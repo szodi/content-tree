@@ -25,9 +25,7 @@ export class App implements OnInit {
 
 
   ngOnInit() {
-    this.treeNodeService.getRootTreeNode().pipe(
-      switchMap(rootNode => this.treeNodeService.getTreeNode(rootNode.id!))
-    ).subscribe(rootNode => {
+    this.treeNodeService.listTree().subscribe(rootNode => {
       this.treeNodeStore.setTreeNode(rootNode);
       this.treeNodeStore.setSelectedNode(rootNode);
     });
@@ -38,12 +36,12 @@ export class App implements OnInit {
       width: '832px'
     }).afterClosed().pipe(
       filter(node => !!node),
-      switchMap(node => this.treeNodeService.createTreeNode(this.selectedNode()!.id!, node))
+      switchMap(node => this.treeNodeService.create(node))
     ).subscribe(node => this.treeNodeStore.addNode(node, this.selectedNode()!.id!));
   }
 
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
-    this.treeNodeService.deleteTreeNode(this.selectedNode()!.id!).subscribe();
+    // this.treeNodeService.deleteTreeNode(this.selectedNode()!.id!).subscribe();
   }
 }

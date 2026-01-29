@@ -1,11 +1,18 @@
 package org.ptc.contenttree.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.ptc.contenttree.dto.TreeNodeDto;
 import org.ptc.contenttree.model.TreeNode;
+import org.ptc.contenttree.service.JsonTreeStorage;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
+@RequiredArgsConstructor
 public class TreeNodeMapper {
+
+    private final JsonTreeStorage storage;
 
     public TreeNodeDto convert(TreeNode treeNode) {
         if (treeNode == null) {
@@ -15,7 +22,12 @@ public class TreeNodeMapper {
                 .id(treeNode.getId())
                 .name(treeNode.getName())
                 .content(treeNode.getContent())
-                .children(treeNode.getChildren() != null ? treeNode.getChildren().stream().map(this::convert).toList() : null)
+                .parentId(treeNode.getParentId())
+                .children(treeNode.getChildrenIds() != null ? buildChildren(treeNode.getChildrenIds()).stream().map(this::convert).toList() : null)
                 .build();
+    }
+
+    private List<TreeNode> buildChildren(List<Long> childrenIds) {
+        return childrenIds.stream().map(storage::findById).toList();
     }
 }

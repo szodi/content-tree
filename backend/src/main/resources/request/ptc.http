@@ -1,13 +1,5 @@
-### getRootTreeNode
-GET http://localhost:8080/nodes/
-Content-Type: application/json
-
-### getTreeNodeList
-GET http://localhost:8080/nodes/1
-Content-Type: application/json
-
-### createTreeNode
-POST http://localhost:8080/nodes/
+### create
+POST http://localhost:8080/api/tree/node
 Content-Type: application/json
 
 {
@@ -15,24 +7,26 @@ Content-Type: application/json
   "content": "my-tree-node-content"
 }
 
-### updateTreeNode
-PUT http://localhost:8080/nodes/
+### delete
+DELETE http://localhost:8080/api/tree/node/2
 Content-Type: application/json
 
-{
-  "id": 1,
-  "name": "updated-node-name",
-  "content": "updated-node-content"
-}
-
-### getTreeNode
-GET http://localhost:8080/nodes/1
+### getRootNode
+GET http://localhost:8080/api/tree
 Content-Type: application/json
 
-### relocateTreeNode
-PUT http://localhost:8080/nodes/2/1
+### listTree
+GET http://localhost:8080/api/tree/node/list
 Content-Type: application/json
 
-### deleteTreeNode
-DELETE http://localhost:8080/nodes/5
+### move
+GET http://localhost:8080/api/tree/move
+Content-Type: application/json
+
+### load
+GET http://localhost:8080/api/tree/content/2
+Content-Type: application/json
+
+### search
+GET http://localhost:8080/api/tree/search
 Content-Type: application/json

@@ -2,46 +2,58 @@ package org.ptc.contenttree.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.ptc.contenttree.dto.TreeNodeDto;
+import org.ptc.contenttree.model.TreeNode;
 import org.ptc.contenttree.service.TreeNodeService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/nodes")
+@RequestMapping("/api/tree")
 @RequiredArgsConstructor
 public class TreeNodeController {
 
-    private final TreeNodeService treeNodeService;
+    private final TreeNodeService service;
 
-    @GetMapping("/")
-    public ResponseEntity<TreeNodeDto> getRootTreeNode() {
-        return ResponseEntity.of(Optional.ofNullable(treeNodeService.getRootTreeNode()));
+    @PostMapping("/node")
+    public TreeNode create(@RequestBody Map<String,Object> body) throws IOException {
+        return service.createOrUpdate(
+                (String) body.get("name"),
+                (String) body.get("content"),
+                body.get("parentId") == null ? null : Long.valueOf(body.get("parentId").toString()),
+                body.get("id") == null ? null : Long.valueOf(body.get("id").toString())
+        );
     }
 
-    @PostMapping("/{parentNodeId}")
-    public ResponseEntity<TreeNodeDto> createTreeNode(@PathVariable Integer parentNodeId, @RequestBody TreeNodeDto treeNodeDto) {
-        return ResponseEntity.of(Optional.ofNullable(treeNodeService.createTreeNode(parentNodeId, treeNodeDto)));
+    @DeleteMapping("/node/{id}")
+    public void delete(@PathVariable Long id) throws IOException {
+        service.delete(id);
     }
 
-    @PutMapping("/")
-    public ResponseEntity<TreeNodeDto> updateTreeNode(@RequestBody TreeNodeDto treeNodeDto) {
-        return ResponseEntity.of(Optional.ofNullable(treeNodeService.updateTreeNode(treeNodeDto)));
+    @GetMapping("/node/list")
+    public TreeNodeDto listTree() {
+        return service.listTree();
     }
 
-    @DeleteMapping("/{nodeId}")
-    public void deleteTreeNode(@PathVariable Integer nodeId) {
-        treeNodeService.deleteTreeNode(nodeId);
+    @GetMapping
+    public TreeNode getRootNode() {
+        return service.getRootNode();
     }
 
-    @GetMapping("/{nodeId}")
-    public ResponseEntity<TreeNodeDto> getTreeNode(@PathVariable Integer nodeId) {
-        return ResponseEntity.of(Optional.ofNullable(treeNodeService.getTreeNodeWithChildren(nodeId)));
+    @PutMapping("/move")
+    public void move(@RequestBody Map<String,Long> body) throws IOException {
+        service.move(body.get("nodeId"), body.get("newParentId"));
     }
 
-    @PutMapping("/{nodeId}/{parentNodeId}")
-    public ResponseEntity<TreeNodeDto> relocateTreeNode(@PathVariable Integer nodeId, @PathVariable Integer parentNodeId) {
-        return ResponseEntity.of(Optional.ofNullable(treeNodeService.relocateTreeNode(nodeId, parentNodeId)));
+    @GetMapping("/content/{id}")
+    public Map<String,String> load(@PathVariable Long id) {
+        return Map.of("content", service.loadContent(id));
+    }
+
+    @GetMapping("/search")
+    public List<TreeNode> search(@RequestParam String text) {
+        return service.search(text);
     }
 }

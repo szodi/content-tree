@@ -1,42 +1,20 @@
 package org.ptc.contenttree.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "node")
-@SequenceGenerator(name = "seq_node", allocationSize = 5)
-@Getter
-@Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TreeNode {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_node")
-    @ToString.Include
-    Integer id;
-
-    @Column(length = 50)
-    String name;
-
-    @Column
-    String content;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "node_relation",
-            joinColumns = @JoinColumn(name = "parent_id"),
-            inverseJoinColumns = @JoinColumn(name = "child_id")
-    )
-    private List<TreeNode> children = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "children", cascade = {CascadeType.ALL})
-    private List<TreeNode> parents;
+    private Long id;
+    private String name;
+    private String content;
+    private Long parentId; // reference only
+    private List<Long> childrenIds = new ArrayList<>();
 }

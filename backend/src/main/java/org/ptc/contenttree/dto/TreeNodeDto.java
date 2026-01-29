@@ -2,6 +2,7 @@ package org.ptc.contenttree.dto;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -9,9 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TreeNodeDto {
-    Integer id;
+    Long id;
     String name;
     String content;
-    List<TreeNodeDto> children;
-    Integer parentId;
+    Long parentId;
+    List<TreeNodeDto> children = new ArrayList<>();
 }

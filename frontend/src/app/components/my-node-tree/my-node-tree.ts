@@ -71,6 +71,7 @@ export class MyNodeTree {
   startDrag(event: MouseEvent, box: ComponentRef<MyNode>) {
     this.selectNode(box.instance.treeNode!);
     if (box.instance.treeNode === this.rootNode()) return;
+    box.instance.dragging = true;
     this.draggingBox.set(box);
     this.draggingBox()!.location.nativeElement.style.zIndex = '1000';
     this.draggingBox()!.location.nativeElement.style.transition = 'none';
@@ -81,6 +82,7 @@ export class MyNodeTree {
     });
     this.offsets = [];
     this.subtree().forEach(node => {
+      node.instance.dragging = true;
       node.location.nativeElement.style.zIndex = '1000';
       node.location.nativeElement.style.transition = 'none';
       const nodeBounds = node.location.nativeElement.getBoundingClientRect();
@@ -111,9 +113,11 @@ export class MyNodeTree {
   @HostListener('document:mouseup')
   onMouseUp() {
     if (this.draggingBox()) {
+      this.draggingBox()!.instance.dragging = false;
       this.draggingBox()!.location.nativeElement.style.zIndex = '1';
       this.draggingBox()!.location.nativeElement.style.transition = 'top 0.2s ease-out, left 0.2s ease-out';
       this.subtree().forEach(node => {
+        node.instance.dragging = false;
         node.location.nativeElement.style.zIndex = '1';
         node.location.nativeElement.style.transition = 'top 0.2s ease-out, left 0.2s ease-out';
       });
@@ -121,7 +125,7 @@ export class MyNodeTree {
     const targetNode = this.nodeComponents().find(compRef => compRef.instance.isOverlapped)?.instance;
     this.nodeComponents().forEach(b => b.instance.isOverlapped = false);
     if (targetNode) {
-      this.treeNodeService.relocateTreeNode(this.draggingBox()?.instance.treeNode!.id!, targetNode.treeNode!.id!).subscribe(node => this.treeNodeStore.setTreeNode(node));
+      // this.treeNodeService.move(this.draggingBox()?.instance.treeNode!.id!, targetNode.treeNode!.id!).subscribe(node => this.treeNodeStore.setTreeNode(node));
     }
     this.setPositions(this.rootNode()!, [], 0);
     this.draggingBox.set(null);
@@ -163,6 +167,7 @@ export class MyNodeTree {
   private createComponentRefList(node: TreeNodeDto, comps: ComponentRef<MyNode>[]) {
     const comp = this.viewContainer.createComponent(MyNode);
     comp.instance.isOverlapped = false;
+    comp.instance.dragging = false;
     comp.instance.treeNode = node;
     comp.instance.clicked.subscribe(e => this.startDrag(e, comp));
     comps.push(comp);

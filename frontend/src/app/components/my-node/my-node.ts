@@ -12,6 +12,7 @@ export class MyNode {
 
   @Input() isSelected= false;
   @Input() isOverlapped= false;
+  @Input() dragging= false;
   @Input() treeNode: TreeNodeDto | undefined;
 
   @Output() clicked = new EventEmitter<MouseEvent>();
