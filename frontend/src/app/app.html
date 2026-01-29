@@ -7,7 +7,11 @@
   </div>
   <footer>
     <button class="j-common-button" (click)="addTreeNode()">Add</button>
-    <button class="j-common-button border-only" (click)="editTreeNode()">Edit</button>
+    <button class="j-common-button" (click)="editTreeNode()">Edit</button>
     <button class="j-common-button red" (click)="deleteTreeNode()">Delete</button>
+    <div class="search-container">
+      <input class="j-common-input" placeholder="Node content" #filter/>
+      <button class="j-common-button border-only" (click)="search(filter.value)">Search</button>
+    </div>
   </footer>
 </div>

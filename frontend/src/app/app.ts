@@ -6,11 +6,12 @@ import {filter, switchMap} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {EditNodeDialog} from './components/edit-node-dialog/edit-node-dialog';
 import {Confirm} from './decorators/confirm-dialog.decorator';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
-  imports: [MyNodeTree],
+  imports: [MyNodeTree, ReactiveFormsModule],
   providers: [TreeNodeStore],
   styleUrl: './app.scss'
 })
@@ -56,5 +57,9 @@ export class App implements OnInit {
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
     this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe();
+  }
+
+  search(query: string) {
+    this.treeNodeService.search(query).subscribe(nodes => console.log(nodes));
   }
 }

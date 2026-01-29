@@ -10,6 +10,7 @@ import {NgClass} from '@angular/common';
 })
 export class MyNode {
 
+  @Input() isHighlighted= false;
   @Input() isSelected= false;
   @Input() isOverlapped= false;
   @Input() dragging= false;

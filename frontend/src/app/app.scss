@@ -1,27 +1,43 @@
+@use 'src/variables.scss' as *;
+
 .main-container {
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: minmax(100px, 300px) 1fr;
   grid-template-rows: 1fr 50px;
-  background-color: cyan;
 
   footer {
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: 32px;
-    background-color: #cccccc;
+    background-color: $ptc-ice-blue;
     padding: 8px;
     max-height: 50px;
+    box-shadow: 2px -2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+
+    .search-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+
+      input {
+        min-width: 400px;
+      }
+    }
   }
 
   .tree-container {
-    background-color: lightpink;
+    background-color: $ptc-very-light-grey;
     position: relative;
   }
 
   .content-container {
-    background-color: lightblue;
+    background-color: $ptc-white;
+    padding: 16px;
   }
 }
