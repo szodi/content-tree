@@ -22,7 +22,6 @@ export class App implements OnInit {
 
   selectedNode = this.treeStore.selectedNode;
 
-
   ngOnInit() {
     this.treeNodeService.getAllNodes().subscribe(nodes => {
       this.treeStore.setNodes(nodes);
@@ -53,10 +52,13 @@ export class App implements OnInit {
 
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
-    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe(() => this.treeStore.deleteNode(this.selectedNode()!));
+    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe(() => {
+      this.treeStore.deleteNode(this.selectedNode()!)
+      console.log('after delete', this.treeStore.nodes())
+    });
   }
 
   search(query: string) {
-    this.treeNodeService.search(query).subscribe(nodes => console.log(nodes));
+    this.treeNodeService.search(query).subscribe(nodes => this.treeStore.filterNodes(nodes));
   }
 }

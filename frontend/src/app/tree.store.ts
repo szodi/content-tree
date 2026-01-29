@@ -4,11 +4,13 @@ import {TreeNode} from '@ptc-api-models/treeNode';
 type TreeState = {
   nodes: TreeNode[] | null;
   selectedNode: TreeNode | null;
+  filteredNodes: TreeNode[] | null;
 }
 
 const initialState: TreeState = {
   nodes: null,
-  selectedNode: null
+  selectedNode: null,
+  filteredNodes: null
 }
 
 export const TreeStore = signalStore(
@@ -31,24 +33,20 @@ export const TreeStore = signalStore(
       patchState(store, { nodes: nodesClone })
     },
     deleteNode(node: TreeNode) {
-      const nodes = deleteNode(store.nodes()!, node)
+      const nodes = deleteNode(cloneNodes(store.nodes()!), node)
+      const parentIndex = nodes.findIndex(n => n.id === node.parentId);
+      nodes[parentIndex] = {
+        ...nodes[parentIndex],
+        childrenIds: nodes[parentIndex].childrenIds!.filter(id => id !== node.id)
+      };
       patchState(store, { nodes })
     },
     setSelectedNode(treeNode: TreeNode) {
       patchState(store, { selectedNode: treeNode })
     },
-    // addNode(treeNode: TreeNodeDto, parentId: number) {
-    //   const rootNode = store.rootNode()!;
-    //   console.log('before', rootNode)
-    //   addNode(rootNode!, treeNode, parentId);
-    //   console.log('after', rootNode)
-    //   patchState(store, { rootNode: { ...rootNode} })
-    // },
-    // updateNode(treeNode: TreeNodeDto) {
-    //   const rootNode = store.rootNode()!;
-    //   updateNode(rootNode!, treeNode);
-    //   patchState(store, { rootNode: { ...rootNode} })
-    // }
+    filterNodes(nodes: TreeNode[]) {
+      patchState(store, { filteredNodes: nodes })
+    }
   }))
 );
 
@@ -65,10 +63,6 @@ function addNode(nodes: TreeNode[], node: TreeNode) {
 
 function deleteNode(nodes: TreeNode[], node: TreeNode) {
   const nodesClone = nodes.filter(n => n.id !== node.id);
-  const parentIndex = nodesClone.findIndex(n => n.id === node.parentId);
-  nodesClone[parentIndex] = {
-    ...nodesClone[parentIndex],
-    childrenIds: nodesClone[parentIndex].childrenIds!.filter(id => id !== node.id)
-  };
+  node.childrenIds?.forEach(childId => deleteNode(nodesClone, nodesClone.find(n => n.id === childId)!));
   return nodesClone;
 }

@@ -3,6 +3,7 @@
     <app-my-node #treeNodeRef
                  [treeNode]="node"
                  [isSelected]="node === selectedNode()"
+                 [isHighlighted]="isFiltered(node)"
                  (mousedown)="startDrag($event, node)">
     </app-my-node>
   }

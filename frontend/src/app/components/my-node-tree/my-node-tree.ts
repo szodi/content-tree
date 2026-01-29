@@ -34,6 +34,7 @@ export class MyNodeTree {
 
   rootNode = computed(() => this.nodes()?.find(node => !node.parentId));
   selectedNode = this.treeStore.selectedNode;
+  filteredNodes = this.treeStore.filteredNodes;
 
   boxElements = viewChildren(MyNode, { read: ElementRef });
   boxComps = viewChildren(MyNode);
@@ -71,6 +72,10 @@ export class MyNodeTree {
     });
   }
 
+  isFiltered(node: TreeNode) {
+    return this.filteredNodes()?.find(filteredNode => filteredNode.id === node.id) !== undefined;
+  }
+
   selectNode(node: TreeNode) {
     this.treeStore.setSelectedNode(node);
   }
@@ -78,7 +83,6 @@ export class MyNodeTree {
   startDrag(event: MouseEvent, node: TreeNode) {
     this.selectNode(node);
     if (node === this.rootNode()) return;
-
     this.draggingBoxBlock.set(this.findBlock(node.id!));
     this.draggingBoxBlock()!.component.dragging = true;
     this.draggingBoxBlock()!.element.nativeElement.style.zIndex = '1000';
@@ -150,17 +154,13 @@ export class MyNodeTree {
 
   private detectOverlaps() {
     if (!this.draggingBoxBlock()) return;
-
     const draggingBoxBounds = this.draggingBoxBlock()?.element.nativeElement.getBoundingClientRect()!;
-
     this.blocks().forEach(block => {
       if (block.component === this.draggingBoxBlock()!.component) {
         block.component.isOverlapped = false;
         return;
       }
-
       const componentBounds = block.element.nativeElement.getBoundingClientRect();
-
       block.component.isOverlapped = !(
         draggingBoxBounds.x + draggingBoxBounds.width < componentBounds.x ||
         draggingBoxBounds.x > componentBounds.x + componentBounds.width ||
@@ -174,7 +174,6 @@ export class MyNodeTree {
     block.element.nativeElement.style.left = `${position.x}px`;
     block.element.nativeElement.style.top = `${position.y}px`;
   }
-
 
   private collectChildNodes(node: TreeNode, subtree: TreeNodeBlock[]) {
     node.childrenIds?.forEach(child => {
