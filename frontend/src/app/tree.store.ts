@@ -34,13 +34,16 @@ export const TreeStore = signalStore(
       patchState(store, { nodes: nodesClone })
     },
     deleteNode(node: TreeNode) {
-      const nodes = deleteNode(cloneNodes(store.nodes()!), node)
+      const nodes = cloneNodes(store.nodes()!);
+      const toDelete: number[] = [];
+      collectNodesToDelete(nodes, node, toDelete);
       const parentIndex = nodes.findIndex(n => n.id === node.parentId);
       nodes[parentIndex] = {
         ...nodes[parentIndex],
         childrenIds: nodes[parentIndex].childrenIds!.filter(id => id !== node.id)
       };
-      patchState(store, { nodes })
+      const deleted = nodes.filter(n => !toDelete.includes(n.id!));
+      patchState(store, { nodes: deleted })
     },
     setSelectedNode(treeNode: TreeNode) {
       patchState(store, { selectedNode: treeNode })
@@ -61,6 +64,11 @@ function addNode(nodes: TreeNode[], node: TreeNode) {
   nodesClone.find(n => n.id === node.parentId)?.childrenIds!.push(node.id!);
   nodesClone.push(node);
   return nodesClone;
+}
+
+function collectNodesToDelete(nodes: TreeNode[], node: TreeNode, toDelete: number[]) {
+  toDelete.push(node.id!);
+  node.childrenIds?.forEach(childId => collectNodesToDelete(nodes, nodes.find(n => n.id === childId)!, toDelete));
 }
 
 function deleteNode(nodes: TreeNode[], node: TreeNode) {
