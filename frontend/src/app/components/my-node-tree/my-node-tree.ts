@@ -125,9 +125,14 @@ export class MyNodeTree {
     const targetNode = this.nodeComponents().find(compRef => compRef.instance.isOverlapped)?.instance;
     this.nodeComponents().forEach(b => b.instance.isOverlapped = false);
     if (targetNode) {
-      // this.treeNodeService.move(this.draggingBox()?.instance.treeNode!.id!, targetNode.treeNode!.id!).subscribe(node => this.treeNodeStore.setTreeNode(node));
+      this.treeNodeService.move(this.draggingBox()?.instance.treeNode!.id!, targetNode.treeNode!.id!).subscribe(node => {
+        this.treeNodeStore.setTreeNode(node)
+        this.viewContainer.clear();
+        this.initComponents()
+      });
+    } else {
+      this.setPositions(this.rootNode()!, [], 0);
     }
-    this.setPositions(this.rootNode()!, [], 0);
     this.draggingBox.set(null);
   }
 

@@ -1,0 +1,170 @@
+@use 'variables.scss' as *;
+
+:root {
+  --text-color: #{$ptc-white};
+  --base-color: #{$ptc-blue};
+  --base-color-dark: #{$ptc-very-dark-blue};
+  --active-color: #{$ptc-light-grey};
+  --disabled-color: #{$ptc-ice-blue};
+  --disabled-background-color: #{$ptc-disabled-gray};
+  --red-base-color: $ptc-medium-red;
+  --red-base-color-dark: $ptc-medium-red;
+  --red-disabled-color: $ptc-ice-red;
+}
+
+.j-icon-button {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--base-color);
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+
+  fa-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+
+    svg {
+      width: 1em;
+      height: 1em;
+      display: block;
+    }
+  }
+
+  &.small {
+    width: 24px;
+    height: 24px;
+    font-size: 1.2rem;
+  }
+
+  &.red {
+    --base-color: #{$ptc-medium-red};
+    --base-color-dark: #{$ptc-medium-red};
+    --disabled-color: #{$ptc-ice-red};
+  }
+
+  &:hover:not([disabled]) {
+    background-color: var(--base-color-dark);
+  }
+
+  &.border-only {
+    border: 2px solid var(--base-color);
+    color: var(--base-color);
+    background: transparent;
+
+    &:hover:not([disabled]) {
+      background: color-mix(in srgb, var(--base-color) 10%, white);
+      color: var(--base-color);
+    }
+
+    &:active:not([disabled]) {
+      color: var(--text-color);
+      background-color: var(--base-color-dark);
+    }
+
+    &[disabled] {
+      color: var(--disabled-background-color);
+    }
+  }
+}
+
+.j-common-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 1.2rem;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  color: var(--text-color);
+  background: var(--base-color);
+  height: 32px;
+
+  &.red {
+    --base-color: #{$ptc-medium-red};
+    --base-color-dark: #{$ptc-medium-red};
+    --disabled-color: #{$ptc-ice-red};
+  }
+
+  &:hover:not([disabled]) {
+    background-color: var(--base-color-dark);
+  }
+
+  &:focus-visible:not([disabled]) {
+    outline: none;
+  }
+
+  &:active:not([disabled]) {
+    color: var(--active-color);
+  }
+
+  &[disabled] {
+    color: var(--disabled-color);
+    background-color: var(--disabled-background-color);
+    border-color: var(--disabled-background-color);
+    transition: none;
+    cursor: not-allowed;
+  }
+
+  &.thin {
+    height: 28px;
+    gap: 6px;
+    padding: 10px 14px;
+    font-size: 1.1rem;
+    min-width: 80px;
+  }
+
+  &.border-only {
+    border: 2px solid var(--base-color);
+    color: var(--base-color);
+    background: transparent;
+
+    &:hover:not([disabled]) {
+      background: color-mix(in srgb, var(--base-color) 10%, white);
+      color: var(--base-color);
+    }
+
+    &:active:not([disabled]) {
+      color: var(--text-color);
+      background-color: var(--base-color-dark);
+    }
+
+    &[disabled] {
+      color: var(--disabled-background-color);
+    }
+  }
+
+  &.naked {
+    color: var(--base-color);
+    background: transparent;
+    border: none;
+
+    &:hover:not([disabled]) {
+      color: var(--base-color-dark);
+      background-color: transparent;
+      border: none;
+    }
+
+    &:active:not([disabled]) {
+      color: var(--base-color-dark);
+      background-color: transparent;
+      border: none;
+    }
+  }
+}

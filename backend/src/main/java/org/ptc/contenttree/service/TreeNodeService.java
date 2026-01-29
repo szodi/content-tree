@@ -55,7 +55,7 @@ public class TreeNodeService {
                 .orElse(null);
     }
 
-    public void move(Long nodeId, Long newParentId) throws IOException {
+    public TreeNodeDto move(Long nodeId, Long newParentId) throws IOException {
         TreeNode node = storage.findById(nodeId);
         TreeNode newParent = storage.findById(newParentId);
 
@@ -70,6 +70,8 @@ public class TreeNodeService {
 
         storage.createOrUpdate(newParent);
         storage.createOrUpdate(node);
+
+        return listTree();
     }
 
     public String loadContent(Long id) {

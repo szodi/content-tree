@@ -42,9 +42,9 @@ public class TreeNodeController {
         return service.getRootNode();
     }
 
-    @PutMapping("/move")
-    public void move(@RequestBody Map<String,Long> body) throws IOException {
-        service.move(body.get("nodeId"), body.get("newParentId"));
+    @PutMapping("/move/{nodeId}/{newParentNodeId}")
+    public TreeNodeDto move(@PathVariable Long nodeId, @PathVariable Long newParentNodeId) throws IOException {
+        return service.move(nodeId, newParentNodeId);
     }
 
     @GetMapping("/content/{id}")

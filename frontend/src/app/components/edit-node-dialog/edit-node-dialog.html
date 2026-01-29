@@ -1,12 +1,5 @@
 <form [formGroup]="form" class="dialog-form">
-  <h2 class="dialog-title">Select certificate template</h2>
-
-<!--    <p class="label">Template:</p>-->
-<!--    <select class="j-common-input" formControlName="id">-->
-<!--      @for (template of templates; track $index) {-->
-<!--        <option [value]="template.id">{{ template.title }}</option>-->
-<!--      }-->
-<!--    </select>-->
+  <h2 class="dialog-title">Edit tree node</h2>
 
   <p class="label required">Name</p>
   <input class="j-common-input" formControlName="name" placeholder="Node name" />
@@ -16,10 +9,10 @@
 
 
   <div class="button-row-container">
-    <button class="j-common-button" (click)="submit()" [disabled]="form.invalid" data-cy="manage-document-save">
+    <button class="j-common-button" (click)="submit()" [disabled]="form.invalid">
       <span>Generate</span>
     </button>
-    <button class="j-common-button border-only cancel-button" (click)="close()" data-cy="manage-document-cancel">
+    <button class="j-common-button border-only cancel-button" (click)="close()">
       <span>Cancel</span>
     </button>
   </div>

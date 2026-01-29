@@ -1,3 +1,6 @@
+@use 'variables.scss' as *;
+@use 'button.scss' as *;
+
 *,
 *::before,
 *::after {
@@ -24,5 +27,44 @@ body {
   user-select: none;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none;     /* old Edge/IE */
+}
+
+.j-common-input {
+  border-radius: 8px;
+  border: 1px solid lightgrey;
+  padding: 4px 8px;
+  display: flex;
+  min-width: 100px;
+  max-width: 500px;
+  height: 26.8px;
+  field-sizing: content;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    color: $ptc-dark-blueish-grey;
+    filter: brightness(85%) opacity(60%);
+    cursor: default;
+  }
+
+  &.deleted {
+    text-decoration: line-through;
+  }
+
+  &.invalid {
+    border-color: $ptc-bug-red;
+    color: $ptc-bug-red;
+  }
+
+  &:not(:disabled):not(.invalid):hover {
+    border-color: $ptc-light-blue;
+  }
+
+  &:not(:disabled):not(.invalid):focus {
+    border-color: $ptc-light-blue;
+    box-shadow: 0 0 0 3px $ptc-very-light-blue;
+  }
 }
 
