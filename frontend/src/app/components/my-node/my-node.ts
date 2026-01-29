@@ -11,6 +11,7 @@ import {TreeNode} from '@ptc-api-models/treeNode';
 export class MyNode {
 
   @Input() isHighlighted= false;
+  @Input() isHalfHighlighted= false;
   @Input() isSelected= false;
   @Input() isOverlapped= false;
   @Input() dragging= false;

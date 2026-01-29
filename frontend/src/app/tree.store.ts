@@ -4,13 +4,15 @@ import {TreeNode} from '@ptc-api-models/treeNode';
 type TreeState = {
   nodes: TreeNode[] | null;
   selectedNode: TreeNode | null;
-  filteredNodes: TreeNode[] | null;
+  filteredNodes: TreeNode[];
+  halfhiglighted: TreeNode[];
 }
 
 const initialState: TreeState = {
   nodes: null,
   selectedNode: null,
-  filteredNodes: null
+  filteredNodes: [],
+  halfhiglighted: []
 }
 
 export const TreeStore = signalStore(
@@ -18,8 +20,7 @@ export const TreeStore = signalStore(
   withState(initialState),
   withMethods(store => ({
     setNodes(nodes: TreeNode[]) {
-      const nodesClone = cloneNodes(nodes);
-      patchState(store, { nodes: nodesClone })
+      patchState(store, { nodes })
     },
     addNode(node: TreeNode) {
       const nodes = addNode(store.nodes()!, node)
@@ -45,7 +46,8 @@ export const TreeStore = signalStore(
       patchState(store, { selectedNode: treeNode })
     },
     filterNodes(nodes: TreeNode[]) {
-      patchState(store, { filteredNodes: nodes })
+      const half = collectParentsWithHighlightedDescendants(store.nodes()!, nodes)
+      patchState(store, { filteredNodes: nodes, halfhiglighted: half })
     }
   }))
 );
@@ -65,4 +67,33 @@ function deleteNode(nodes: TreeNode[], node: TreeNode) {
   const nodesClone = nodes.filter(n => n.id !== node.id);
   node.childrenIds?.forEach(childId => deleteNode(nodesClone, nodesClone.find(n => n.id === childId)!));
   return nodesClone;
+}
+
+function collectParentsWithHighlightedDescendants(nodes: TreeNode[], filteredNodes: TreeNode[]) {
+  // 1) Build lookup map
+  const nodeMap = new Map<number, TreeNode>();
+  for (const node of nodes) {
+    nodeMap.set(node.id!, node);
+  }
+
+  const result = new Set<number>(); // store parent node IDs
+
+  // 2) Find all highlighted nodes
+  const highlightedNodes = nodes.filter(n => filteredNodes.some(fn => fn.id === n.id));
+
+  // 3) For each highlighted node, walk up the tree
+  for (const node of highlightedNodes) {
+    let current = node;
+
+    while (current.parentId != null) {
+      const parent = nodeMap.get(current.parentId);
+      if (!parent) break;
+
+      result.add(parent.id!);   // collect parent
+      current = parent;        // move up
+    }
+  }
+
+  // 4) Return actual node objects (or IDs if preferred)
+  return [...result].map(id => nodeMap.get(id)!);
 }

@@ -36,11 +36,15 @@ export class MyNodeTree {
   selectedNode = this.treeStore.selectedNode;
   filteredNodes = this.treeStore.filteredNodes;
 
+  halfhiglighted = this.treeStore.halfhiglighted;
+
   boxElements = viewChildren(MyNode, { read: ElementRef });
   boxComps = viewChildren(MyNode);
 
   blocks = computed(() =>
     this.boxElements().map((element, index) => {
+      const isHalfHighlighted = this.halfhiglighted()!.find(hh => hh.id === this.boxComps()[index].treeNode?.id)
+      this.boxComps()[index].isHalfHighlighted = !!isHalfHighlighted;
       return {
         component: this.boxComps()[index],
         treeNode: this.boxComps()[index].treeNode,
@@ -140,9 +144,20 @@ export class MyNodeTree {
       const targetNode = this.blocks().find(compRef => compRef.component.isOverlapped)?.component.treeNode;
       this.blocks().forEach(b => b.component.isOverlapped = false);
       if (targetNode) {
-        this.treeNodeService.move(this.draggingBoxBlock()?.component.treeNode!.id!, targetNode.id!).subscribe(node => {
-          // this.treeStore.setNodes(node)
-          // this.initComponents()
+        const sourceNode = this.draggingBoxBlock()?.component.treeNode!;
+        this.treeNodeService.move(sourceNode.id!, targetNode.id!).subscribe(node => {
+          console.log('blocks', this.blocks(), sourceNode);
+          const blockChild = this.findBlock(sourceNode.id!);
+          blockChild.component.treeNode = {
+            ...blockChild.component.treeNode,
+            parentId: targetNode.id
+          };
+          const blockParent = this.findBlock(targetNode.id!);
+          blockParent.component.treeNode = {
+            ...blockParent.component.treeNode,
+            childrenIds: [...blockParent.component.treeNode?.childrenIds!, blockChild.component.treeNode.id!]
+          }
+          this.treeStore.setNodes(node)
         });
       } else {
         this.blocks().forEach(block => this.setComponentPosition(block, block.position));
