@@ -77,15 +77,11 @@ export class MyNodeTree {
   }
 
   isFiltered(node: TreeNode) {
-    return this.filteredNodes()?.find(filteredNode => filteredNode.id === node.id) !== undefined;
-  }
-
-  selectNode(node: TreeNode) {
-    this.treeStore.setSelectedNode(node);
+    return !!this.filteredNodes()?.find(filteredNode => filteredNode.id === node.id);
   }
 
   startDrag(event: MouseEvent, node: TreeNode) {
-    this.selectNode(node);
+    this.treeStore.setSelectedNode(node);
     if (node === this.rootNode()) return;
     this.draggingBoxBlock.set(this.findBlock(node.id!));
     this.draggingBoxBlock()!.component.dragging = true;
@@ -141,34 +137,11 @@ export class MyNodeTree {
       });
 
       const targetNode = this.blocks().find(compRef => compRef.component.isOverlapped)?.component.treeNode;
+      this.blocks().forEach(b => b.component.isOverlapped = false);
       if (targetNode) {
-        const sourceNode = this.draggingBoxBlock()?.component.treeNode!;
-        const targetBlock = this.findBlock(targetNode.id!);
-        targetNode.childrenIds!.push(sourceNode.id!);
-        targetBlock.component.treeNode = targetNode;
-        this.treeStore.updateNode(targetNode)
-        // this.boxComps().forEach(b => {
-        //   b.isOverlapped = false
-        //   if (b.treeNode!.id === sourceNode.id!) {
-        //     b.treeNode = {
-        //       ...b.treeNode,
-        //       parentId: targetNode.id
-        //     };
-        //   }
-        //   if (b.treeNode!.id === targetNode.id!) {
-        //     b.treeNode = {
-        //       ...b.treeNode,
-        //       childrenIds: [...b.treeNode!.childrenIds!, sourceNode.id!]
-        //     }
-        //   }
-        // });
-
-        this.treeNodeService.move(sourceNode.id!, targetNode.id!).subscribe(nodes => this.treeStore.setNodes(nodes));
+        this.treeNodeService.move(this.draggingBoxBlock()?.component.treeNode!.id!, targetNode.id!).subscribe(nodes => this.treeStore.setNodes(nodes));
       } else {
-        this.blocks().forEach(block => {
-          this.setComponentPosition(block, block.position)
-          block.component.isOverlapped = false;
-        });
+        this.blocks().forEach(block => this.setComponentPosition(block, block.position));
       }
 
       this.draggingBoxBlock.set(null);
@@ -198,19 +171,18 @@ export class MyNodeTree {
     block.element.nativeElement.style.top = `${position.y}px`;
   }
 
-  private collectChildNodes(node: TreeNode, subtree: TreeNodeBlock[]) {
+  private collectChildNodes(node: TreeNode, children: TreeNodeBlock[]) {
     node.childrenIds?.forEach(child => {
       const childBlock = this.findBlock(child)!;
-      subtree.push(childBlock);
-      this.collectChildNodes(childBlock.treeNode, subtree)
+      children.push(childBlock);
+      this.collectChildNodes(childBlock.treeNode, children)
     });
   }
 
   relocateComponents() {
     this.blocks().forEach(block => block.position = {x: 0, y: 0});
-    const rootBlock = this.blocks().find(block => block.treeNode.id === this.rootNode()!.id)!;
     const relocatedBlocks: TreeNodeBlock[] = [];
-    this.relocate(rootBlock.treeNode, {x: 0, y: 0}, relocatedBlocks);
+    this.relocate(this.rootNode()!, {x: 0, y: 0}, relocatedBlocks);
     relocatedBlocks.forEach(block => {
       block.element.nativeElement.style.left = `${block.position.x}px`;
       block.element.nativeElement.style.top = `${block.position.y}px`;
@@ -224,7 +196,7 @@ export class MyNodeTree {
       y: nodeBlock.position.y + offset.y
     }
     relocatedBlocks.push(nodeBlock);
-    node.childrenIds!.forEach(child => this.relocate(this.findBlock(child).treeNode, {
+    node.childrenIds!.forEach(child => this.relocate(this.nodes()!.find(n => n.id === child)!, {
       x: nodeBlock.position.x + this.horizontalGap,
       y: this.verticalGap * relocatedBlocks.length
     }, relocatedBlocks));
