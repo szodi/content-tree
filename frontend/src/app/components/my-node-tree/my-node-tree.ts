@@ -116,9 +116,12 @@ export class MyNodeTree implements AfterViewInit {
     ctx.lineWidth = 1;
     this.nodes()!.forEach(node => {
       const block = this.findBlock(node.id!);
+      if (!block) return;
       const parentBlockCenter = this.getCenterOfBlock(block);
       node.childrenIds?.forEach(childId => {
-        const childBlockCenter = this.getCenterOfBlock(this.findBlock(childId));
+        const childBlock = this.findBlock(childId);
+        if (!childBlock) return;
+        const childBlockCenter = this.getCenterOfBlock(childBlock);
         ctx.moveTo(parentBlockCenter.x, parentBlockCenter.y);
         ctx.lineTo(parentBlockCenter.x, childBlockCenter.y);
         ctx.lineTo(childBlockCenter.x, childBlockCenter.y);
@@ -250,6 +253,7 @@ export class MyNodeTree implements AfterViewInit {
 
   private relocate(node: TreeNode, offset: Point, relocatedBlocks: TreeNodeBlock[]) {
     const nodeBlock = this.findBlock(node.id!);
+    if (!nodeBlock) return;
     nodeBlock.position = {
       x: nodeBlock.position.x + offset.x,
       y: nodeBlock.position.y + offset.y

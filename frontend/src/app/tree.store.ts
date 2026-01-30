@@ -30,10 +30,16 @@ export const TreeStore = signalStore(
       const nodes = addNode(store.nodes()!, node)
       patchState(store, { nodes })
     },
-    updateNode(node: TreeNode) {
+    moveNode(node: TreeNode) {
       const nodeIndex = store.nodes()!.findIndex(n => n.id === node.id);
       const nodesClone = cloneNodes(store.nodes()!) as TreeNode[];
       nodesClone.find(n => n.id === node.parentId)?.childrenIds!.push(node.id!);
+      nodesClone[nodeIndex] = node;
+      patchState(store, { nodes: nodesClone })
+    },
+    updateNode(node: TreeNode) {
+      const nodeIndex = store.nodes()!.findIndex(n => n.id === node.id);
+      const nodesClone = cloneNodes(store.nodes()!) as TreeNode[];
       nodesClone[nodeIndex] = node;
       patchState(store, { nodes: nodesClone })
     },
