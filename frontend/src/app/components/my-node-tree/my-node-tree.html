@@ -1,0 +1,11 @@
+@if (nodes()?.length) {
+  <canvas #canvas class="node-tree-canvas"></canvas>
+  @for (node of nodes(); track node.id) {
+    <app-my-node #treeNodeRef
+                 [treeNode]="node"
+                 [isSelected]="node === selectedNode()"
+                 [isHighlighted]="isFiltered(node)"
+                 (mousedown)="startDrag($event, node)">
+    </app-my-node>
+  }
+}

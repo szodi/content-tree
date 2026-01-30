@@ -21,8 +21,8 @@ Content-Type: application/json
 DELETE http://localhost:8080/api/tree/node/2
 Content-Type: application/json
 
-### listTree
-GET http://localhost:8080/api/tree/node/list
+### getAllNodes
+GET http://localhost:8080/api/tree/node/all
 Content-Type: application/json
 
 ### move

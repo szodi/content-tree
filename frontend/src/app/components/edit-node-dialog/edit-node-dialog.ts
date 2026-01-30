@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {TreeNodeDto} from '@ptc-api-models/treeNodeDto';
+import {TreeNode} from '@ptc-api-models/treeNode';
 
 @Component({
   selector: 'app-edit-node-dialog',
@@ -13,7 +13,7 @@ import {TreeNodeDto} from '@ptc-api-models/treeNodeDto';
 })
 export class EditNodeDialog {
 
-  data = inject<TreeNodeDto>(MAT_DIALOG_DATA);
+  data = inject<TreeNode>(MAT_DIALOG_DATA);
   dialogRef = inject(MatDialogRef<EditNodeDialog>);
 
   fb = inject(FormBuilder);
@@ -23,7 +23,7 @@ export class EditNodeDialog {
     content: ['', Validators.required]
   });
 
-  treeNode: TreeNodeDto | undefined;
+  treeNode: TreeNode | undefined;
 
   constructor() {
     this.treeNode = this.data;

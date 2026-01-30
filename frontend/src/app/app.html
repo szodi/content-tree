@@ -1,17 +1,18 @@
 <div class="main-container">
-  <div class="tree-container no-select">
-    <app-my-node-tree></app-my-node-tree>
+  <div class="tree-container no-select" (click)="deleteSearchInput()">
+    @if (treeStore.nodes()?.length) {
+      <app-my-node-tree></app-my-node-tree>
+    }
   </div>
   <div class="content-container">
     {{ selectedNode()?.content ?? 'Select a node to see its content' }}
   </div>
   <footer>
-    <button class="j-common-button" (click)="addTreeNode()">Add</button>
-    <button class="j-common-button" (click)="editTreeNode()">Edit</button>
-    <button class="j-common-button red" (click)="deleteTreeNode()">Delete</button>
+    <button class="j-common-button" (click)="addTreeNode()" [disabled]="!selectedNode()">Add</button>
+    <button class="j-common-button" (click)="editTreeNode()" [disabled]="!selectedNode()">Edit</button>
+    <button class="j-common-button red" (click)="deleteTreeNode()" [disabled]="!selectedNode()">Delete</button>
     <div class="search-container">
-      <input class="j-common-input" placeholder="Node content" #filter/>
-      <button class="j-common-button border-only" (click)="search(filter.value)">Search</button>
+      <input class="j-common-input" placeholder="Node content" #searchInput />
     </div>
   </footer>
 </div>

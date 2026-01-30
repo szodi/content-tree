@@ -6,7 +6,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -18,7 +17,6 @@ public class InitService implements ApplicationRunner {
     private final TreeNodeService treeNodeService;
 
     @Override
-    @Transactional
     public void run(ApplicationArguments args) throws IOException {
         TreeNode root = treeNodeService.createOrUpdate("root", "Root tree node", null, null);
 

@@ -1,3 +1,9 @@
-<div class="parent-container" [ngClass]="{ overlapped: isOverlapped, selected: isSelected, dragging, highlight: isHighlighted }" (mousedown)="onClick($event)">
+<div class="parent-container" [ngClass]="{
+    overlapped: isOverlapped,
+    selected: isSelected,
+    dragging,
+    highlight: isHighlighted,
+    halfhighlighted: isHalfHighlighted
+  }" (mousedown)="onClick($event)">
   <p>{{ treeNode?.name }}</p>
 </div>

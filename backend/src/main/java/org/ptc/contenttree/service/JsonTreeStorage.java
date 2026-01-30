@@ -2,10 +2,10 @@ package org.ptc.contenttree.service;
 
 import jakarta.annotation.PostConstruct;
 import org.ptc.contenttree.model.TreeNode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,13 +16,18 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class JsonTreeStorage {
 
-    private static final Path FILE = Paths.get("data/tree.json");
+    @Value( "${ptc.storage.file.path}")
+    private String filePath = "data/tree.json";
+
+    private Path FILE;
+
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, TreeNode> cache = new ConcurrentHashMap<>();
     private final AtomicLong idGen = new AtomicLong(1);
 
     @PostConstruct
     public void init() {
+        this.FILE = Paths.get(filePath);
         try {
             if (Files.exists(FILE)) {
                 List<TreeNode> nodes = Arrays.asList(mapper.readValue(FILE.toFile(), TreeNode[].class));
@@ -39,11 +44,11 @@ public class JsonTreeStorage {
         }
     }
 
-    synchronized void save() throws IOException {
+    synchronized void save() {
         mapper.writerWithDefaultPrettyPrinter().writeValue(FILE.toFile(), cache.values());
     }
 
-    public synchronized TreeNode createOrUpdate(TreeNode node) throws IOException {
+    public synchronized TreeNode createOrUpdate(TreeNode node) {
         if (node.getId() == null) {
             node.setId(getNextId());
         }
@@ -52,7 +57,7 @@ public class JsonTreeStorage {
         return node;
     }
 
-    public synchronized void delete(Long id) throws IOException {
+    public synchronized void delete(Long id) {
         Collection<TreeNode> all = findAll();
         all.forEach(n -> n.getChildrenIds().remove(id));
         TreeNode node = cache.get(id);
