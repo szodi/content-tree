@@ -143,6 +143,8 @@ export class MyNodeTree implements AfterViewInit {
 
   startDrag(event: MouseEvent, node: TreeNode) {
     this.treeStore.setSelectedNode(node);
+    this.treeStore.setFilteredNodes([]);
+    this.treeStore.setHalfhiglighted([]);
     if (node === this.rootNode()) return;
     this.draggingBoxBlock.set(this.findBlock(node.id!));
     this.draggingBoxBlock()!.component.dragging = true;
@@ -170,7 +172,6 @@ export class MyNodeTree implements AfterViewInit {
   onMouseMove(event: MouseEvent) {
     event.preventDefault();
     if (!this.draggingBoxBlock()) return;
-
     this.setComponentPosition(this.draggingBoxBlock()!, {
       x: event.clientX - this.draggingBoxOffset().x,
       y: event.clientY - this.draggingBoxOffset().y

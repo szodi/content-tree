@@ -26,6 +26,12 @@ export const TreeStore = signalStore(
     setNodes(nodes: TreeNode[]) {
       patchState(store, { nodes })
     },
+    setFilteredNodes(filteredNodes: TreeNode[]) {
+      patchState(store, { filteredNodes })
+    },
+    setHalfhiglighted(halfhiglighted: TreeNode[]) {
+      patchState(store, { halfhiglighted })
+    },
     addNode(node: TreeNode) {
       const nodes = addNode(store.nodes()!, node)
       patchState(store, { nodes })

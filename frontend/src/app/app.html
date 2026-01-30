@@ -1,5 +1,5 @@
 <div class="main-container">
-  <div class="tree-container no-select">
+  <div class="tree-container no-select" (click)="deleteSearchInput()">
     @if (treeStore.nodes()?.length) {
       <app-my-node-tree></app-my-node-tree>
     }
@@ -12,8 +12,7 @@
     <button class="j-common-button" (click)="editTreeNode()" [disabled]="!selectedNode()">Edit</button>
     <button class="j-common-button red" (click)="deleteTreeNode()" [disabled]="!selectedNode()">Delete</button>
     <div class="search-container">
-      <input class="j-common-input" placeholder="Node content" #filter/>
-      <button class="j-common-button border-only" (click)="search(filter.value)">Search</button>
+      <input class="j-common-input" placeholder="Node content" #searchInput />
     </div>
   </footer>
 </div>
