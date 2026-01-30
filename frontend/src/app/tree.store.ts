@@ -1,5 +1,6 @@
-import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
+import {patchState, signalStore, withComputed, withMethods, withState} from '@ngrx/signals';
 import {TreeNode} from '@ptc-api-models/treeNode';
+import {computed} from '@angular/core';
 
 type TreeState = {
   nodes: TreeNode[] | null;
@@ -18,6 +19,9 @@ const initialState: TreeState = {
 export const TreeStore = signalStore(
   { providedIn: 'root'},
   withState(initialState),
+  withComputed(store => ({
+    rootNode: computed(() => store.nodes()?.find(node => !node.parentId)),
+  })),
   withMethods(store => ({
     setNodes(nodes: TreeNode[]) {
       patchState(store, { nodes })
@@ -34,14 +38,14 @@ export const TreeStore = signalStore(
       patchState(store, { nodes: nodesClone })
     },
     deleteNode(node: TreeNode) {
-      const nodes = cloneNodes(store.nodes()!);
+      const nodes = store.nodes()!.map(n => {
+        if (n.childrenIds?.includes(node.id!)) {
+          return {...n, childrenIds: n.childrenIds!.filter(id => id !== node.id)}
+        }
+        return n;
+      })
       const toDelete: number[] = [];
       collectNodesToDelete(nodes, node, toDelete);
-      const parentIndex = nodes.findIndex(n => n.id === node.parentId);
-      nodes[parentIndex] = {
-        ...nodes[parentIndex],
-        childrenIds: nodes[parentIndex].childrenIds!.filter(id => id !== node.id)
-      };
       const deleted = nodes.filter(n => !toDelete.includes(n.id!));
       patchState(store, { nodes: deleted })
     },
@@ -69,12 +73,6 @@ function addNode(nodes: TreeNode[], node: TreeNode) {
 function collectNodesToDelete(nodes: TreeNode[], node: TreeNode, toDelete: number[]) {
   toDelete.push(node.id!);
   node.childrenIds?.forEach(childId => collectNodesToDelete(nodes, nodes.find(n => n.id === childId)!, toDelete));
-}
-
-function deleteNode(nodes: TreeNode[], node: TreeNode) {
-  const nodesClone = nodes.filter(n => n.id !== node.id);
-  node.childrenIds?.forEach(childId => deleteNode(nodesClone, nodesClone.find(n => n.id === childId)!));
-  return nodesClone;
 }
 
 function collectParentsWithHighlightedDescendants(nodes: TreeNode[], filteredNodes: TreeNode[]) {

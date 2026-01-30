@@ -52,10 +52,7 @@ export class App implements OnInit {
 
   @Confirm({ question: "Are you sure you want to delete this node?"})
   deleteTreeNode() {
-    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe(() => {
-      this.treeStore.deleteNode(this.selectedNode()!)
-      console.log('after delete', this.treeStore.nodes())
-    });
+    this.treeNodeService.deleteNode(this.selectedNode()!.id!).subscribe(() => this.treeStore.deleteNode(this.selectedNode()!));
   }
 
   search(query: string) {

@@ -107,7 +107,6 @@ export class MyNodeTree {
         y: event.clientY - nodeBounds.y
       })
     });
-    console.log(this.subtree());
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -142,25 +141,34 @@ export class MyNodeTree {
       });
 
       const targetNode = this.blocks().find(compRef => compRef.component.isOverlapped)?.component.treeNode;
-      this.blocks().forEach(b => b.component.isOverlapped = false);
       if (targetNode) {
         const sourceNode = this.draggingBoxBlock()?.component.treeNode!;
-        this.treeNodeService.move(sourceNode.id!, targetNode.id!).subscribe(node => {
-          console.log('blocks', this.blocks(), sourceNode);
-          const blockChild = this.findBlock(sourceNode.id!);
-          blockChild.component.treeNode = {
-            ...blockChild.component.treeNode,
-            parentId: targetNode.id
-          };
-          const blockParent = this.findBlock(targetNode.id!);
-          blockParent.component.treeNode = {
-            ...blockParent.component.treeNode,
-            childrenIds: [...blockParent.component.treeNode?.childrenIds!, blockChild.component.treeNode.id!]
-          }
-          this.treeStore.setNodes(node)
-        });
+        const targetBlock = this.findBlock(targetNode.id!);
+        targetNode.childrenIds!.push(sourceNode.id!);
+        targetBlock.component.treeNode = targetNode;
+        this.treeStore.updateNode(targetNode)
+        // this.boxComps().forEach(b => {
+        //   b.isOverlapped = false
+        //   if (b.treeNode!.id === sourceNode.id!) {
+        //     b.treeNode = {
+        //       ...b.treeNode,
+        //       parentId: targetNode.id
+        //     };
+        //   }
+        //   if (b.treeNode!.id === targetNode.id!) {
+        //     b.treeNode = {
+        //       ...b.treeNode,
+        //       childrenIds: [...b.treeNode!.childrenIds!, sourceNode.id!]
+        //     }
+        //   }
+        // });
+
+        this.treeNodeService.move(sourceNode.id!, targetNode.id!).subscribe(nodes => this.treeStore.setNodes(nodes));
       } else {
-        this.blocks().forEach(block => this.setComponentPosition(block, block.position));
+        this.blocks().forEach(block => {
+          this.setComponentPosition(block, block.position)
+          block.component.isOverlapped = false;
+        });
       }
 
       this.draggingBoxBlock.set(null);
