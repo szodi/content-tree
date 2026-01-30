@@ -10,7 +10,7 @@
   <footer>
     <button class="j-common-button" (click)="addTreeNode()" [disabled]="!selectedNode()">Add</button>
     <button class="j-common-button" (click)="editTreeNode()" [disabled]="!selectedNode()">Edit</button>
-    <button class="j-common-button red" (click)="deleteTreeNode()" [disabled]="!selectedNode()">Delete</button>
+    <button class="j-common-button red" (click)="deleteTreeNode()" [disabled]="!selectedNode() || selectedNode() === rootNode()">Delete</button>
     <div class="search-container">
       <input class="j-common-input" placeholder="Node content" #searchInput />
     </div>

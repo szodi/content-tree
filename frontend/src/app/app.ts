@@ -23,6 +23,7 @@ export class App implements OnInit, AfterViewInit {
   destroyRef = inject(DestroyRef);
 
   selectedNode = this.treeStore.selectedNode;
+  rootNode = this.treeStore.rootNode;
 
   @ViewChild('searchInput', { static: true }) input!: ElementRef<HTMLInputElement>;
 
