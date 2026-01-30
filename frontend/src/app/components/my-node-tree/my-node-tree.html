@@ -1,4 +1,5 @@
 @if (nodes()?.length) {
+  <canvas #canvas class="node-tree-canvas"></canvas>
   @for (node of nodes(); track node.id) {
     <app-my-node #treeNodeRef
                  [treeNode]="node"

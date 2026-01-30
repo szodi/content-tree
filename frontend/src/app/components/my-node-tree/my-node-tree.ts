@@ -1,4 +1,15 @@
-import {Component, computed, effect, ElementRef, HostListener, inject, signal, viewChildren} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  ViewChild,
+  viewChildren
+} from '@angular/core';
 import {MyNode} from '../my-node/my-node';
 import {TreeNodeControllerService} from '@ptc-api-services/treeNodeController.service';
 import {TreeStore} from '../../tree.store';
@@ -22,7 +33,7 @@ interface TreeNodeBlock {
   templateUrl: './my-node-tree.html',
   styleUrl: './my-node-tree.scss',
 })
-export class MyNodeTree {
+export class MyNodeTree implements AfterViewInit {
 
   private verticalGap = 50;
   private horizontalGap = 50;
@@ -68,12 +79,59 @@ export class MyNodeTree {
 
   offsets: Point[] = [];
 
+  @ViewChild('canvas') canvas!: ElementRef;
+
+  ctx: CanvasRenderingContext2D | null = null;
+
+  ngAfterViewInit(): void {
+    this.ctx = this.setupCanvas(this.canvas.nativeElement);
+  }
+
+  private setupCanvas(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')!;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    return ctx;
+  }
+
   constructor() {
     effect(() => {
       if (this.nodes()?.length && this.blocks()?.length) {
         this.relocateComponents();
       }
     });
+  }
+
+  private drawLines() {
+    const ctx = this.ctx!;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    ctx.beginPath();
+    ctx.strokeStyle = '#cc8866';
+    ctx.lineWidth = 1;
+    this.nodes()!.forEach(node => {
+      const block = this.findBlock(node.id!);
+      const parentBlockCenter = this.getCenterOfBlock(block);
+      node.childrenIds?.forEach(childId => {
+        const childBlockCenter = this.getCenterOfBlock(this.findBlock(childId));
+        ctx.moveTo(parentBlockCenter.x, parentBlockCenter.y);
+        ctx.lineTo(parentBlockCenter.x, childBlockCenter.y);
+        ctx.lineTo(childBlockCenter.x, childBlockCenter.y);
+        ctx.stroke();
+      });
+    })
+  }
+
+  private getCenterOfBlock(block: TreeNodeBlock) {
+    return {
+      x: block.position.x + block.element.nativeElement.offsetWidth / 2,
+      y: block.position.y + block.element.nativeElement.offsetHeight / 2
+    }
   }
 
   isFiltered(node: TreeNode) {
@@ -187,6 +245,7 @@ export class MyNodeTree {
       block.element.nativeElement.style.left = `${block.position.x}px`;
       block.element.nativeElement.style.top = `${block.position.y}px`;
     });
+    this.drawLines();
   }
 
   private relocate(node: TreeNode, offset: Point, relocatedBlocks: TreeNodeBlock[]) {
