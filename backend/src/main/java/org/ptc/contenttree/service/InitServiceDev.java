@@ -7,8 +7,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 @Profile("dev")
@@ -17,7 +15,11 @@ public class InitServiceDev implements ApplicationRunner {
     private final TreeNodeService treeNodeService;
 
     @Override
-    public void run(ApplicationArguments args) throws IOException {
+    public void run(ApplicationArguments args) {
+        if (!treeNodeService.getAllNodes().isEmpty()) {
+            return;
+        }
+
         TreeNode root = treeNodeService.createOrUpdate("root", "Root tree node", null, null);
 
         TreeNode child1 = treeNodeService.createOrUpdate("child1", "Child1 tree node", root.getId(), null);
