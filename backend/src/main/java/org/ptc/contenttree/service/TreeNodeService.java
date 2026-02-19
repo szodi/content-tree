@@ -2,73 +2,141 @@ package org.ptc.contenttree.service;
 
 import lombok.RequiredArgsConstructor;
 import org.ptc.contenttree.model.TreeNode;
+import org.ptc.contenttree.repository.TreeNodeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TreeNodeService {
 
-    private final JsonTreeStorage storage;
+    private final TreeNodeRepository repository;
 
-    public TreeNode createOrUpdate(String name, String content, Long parentId, Long id) throws IOException {
-        TreeNode node = (id != null) ? storage.findById(id) : new TreeNode();
-        if (node == null) node = new TreeNode();
+    public TreeNode createOrUpdate(String name, String content, Long parentId, Long id) {
+        validateParentForUpsert(id, parentId);
+
+        TreeNode node = id == null
+                ? TreeNode.builder().build()
+                : repository.findById(id).orElseThrow(() -> new NoSuchElementException("Node not found: " + id));
+
+        Long oldParentId = node.getParentId();
+
         node.setName(name);
         node.setContent(content);
         node.setParentId(parentId);
+        TreeNode saved = repository.save(node);
 
-        node = storage.createOrUpdate(node);
-        if (parentId != null) {
-            TreeNode parent = storage.findById(parentId);
-            if (!parent.getChildrenIds().contains(node.getId())) {
-                parent.getChildrenIds().add(node.getId());
-                storage.createOrUpdate(parent);
-            }
+        if (!Objects.equals(oldParentId, parentId)) {
+            removeChildFromParent(oldParentId, saved.getId());
+            addChildToParent(parentId, saved.getId());
+        } else if (parentId != null) {
+            addChildToParent(parentId, saved.getId());
         }
 
-        return node;
+        return saved;
     }
 
-    public void delete(Long id) throws IOException {
-        storage.delete(id);
-        storage.save();
+    public void delete(Long id) {
+        TreeNode node = repository.findById(id).orElseThrow(() -> new NoSuchElementException("Node not found: " + id));
+
+        removeChildFromParent(node.getParentId(), id);
+        for (Long childId : List.copyOf(node.getChildrenIds())) {
+            delete(childId);
+        }
+
+        repository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public Collection<TreeNode> getAllNodes() {
-        return storage.findAll();
+        return repository.findAll();
     }
 
-    public Collection<TreeNode> move(Long nodeId, Long newParentId) throws IOException {
-        TreeNode node = storage.findById(nodeId);
-        TreeNode newParent = storage.findById(newParentId);
-
-        if (node.getParentId() != null) {
-            TreeNode oldParent = storage.findById(node.getParentId());
-            oldParent.getChildrenIds().remove(nodeId);
-            storage.createOrUpdate(oldParent);
+    public Collection<TreeNode> move(Long nodeId, Long newParentId) {
+        if (Objects.equals(nodeId, newParentId)) {
+            throw new IllegalArgumentException("Node cannot be parent of itself.");
         }
+
+        TreeNode node = repository.findById(nodeId).orElseThrow(() -> new NoSuchElementException("Node not found: " + nodeId));
+        repository.findById(newParentId).orElseThrow(() -> new NoSuchElementException("Parent node not found: " + newParentId));
+        ensureNotDescendant(nodeId, newParentId);
+
+        removeChildFromParent(node.getParentId(), nodeId);
+        addChildToParent(newParentId, nodeId);
 
         node.setParentId(newParentId);
-        newParent.getChildrenIds().add(nodeId);
+        repository.save(node);
 
-        storage.createOrUpdate(newParent);
-        storage.createOrUpdate(node);
-
-        return getAllNodes();
+        return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public String loadContent(Long id) {
-        return storage.findById(id).getContent();
+        return repository.findById(id)
+                .map(TreeNode::getContent)
+                .orElseThrow(() -> new NoSuchElementException("Node not found: " + id));
     }
 
+    @Transactional(readOnly = true)
     public List<TreeNode> search(String text) {
-        return storage.findAll().stream()
-                .filter(n -> n.getName().toLowerCase().contains(text.toLowerCase()) ||
-                        n.getContent().toLowerCase().contains(text.toLowerCase()))
+        String searchText = text == null ? "" : text.toLowerCase();
+
+        return repository.findAll().stream()
+                .filter(n -> n.getName().toLowerCase().contains(searchText)
+                        || n.getContent().toLowerCase().contains(searchText))
                 .toList();
+    }
+
+    private void validateParentForUpsert(Long id, Long parentId) {
+        if (parentId == null) {
+            return;
+        }
+        if (Objects.equals(id, parentId)) {
+            throw new IllegalArgumentException("Node cannot be parent of itself.");
+        }
+        repository.findById(parentId).orElseThrow(() -> new NoSuchElementException("Parent node not found: " + parentId));
+        if (id != null) {
+            ensureNotDescendant(id, parentId);
+        }
+    }
+
+    private void ensureNotDescendant(Long nodeId, Long candidateParentId) {
+        Long currentId = candidateParentId;
+        while (currentId != null) {
+            if (Objects.equals(currentId, nodeId)) {
+                throw new IllegalArgumentException("Cannot move node under its own descendant.");
+            }
+            currentId = repository.findById(currentId).map(TreeNode::getParentId).orElse(null);
+        }
+    }
+
+    private void removeChildFromParent(Long parentId, Long childId) {
+        if (parentId == null) {
+            return;
+        }
+        repository.findById(parentId).ifPresent(parent -> {
+            if (parent.getChildrenIds().remove(childId)) {
+                repository.save(parent);
+            }
+        });
+    }
+
+    private void addChildToParent(Long parentId, Long childId) {
+        if (parentId == null) {
+            return;
+        }
+        TreeNode parent = repository.findById(parentId)
+                .orElseThrow(() -> new NoSuchElementException("Parent node not found: " + parentId));
+
+        if (!parent.getChildrenIds().contains(childId)) {
+            parent.getChildrenIds().add(childId);
+            repository.save(parent);
+        }
     }
 }
